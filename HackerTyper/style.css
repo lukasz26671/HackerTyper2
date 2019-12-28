@@ -21,7 +21,7 @@ html, body ,a{
 
 .footer, .pusha {
 	height: 20px; /* .push must be the same height as .footer */
-	background:#aa00ff;
+	background: none;
 }
 
 .accessGranted{
