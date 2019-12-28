@@ -74,31 +74,17 @@ var Typer={
 			}
 		}else if(key.keyCode==27){ // key 27 = esc key
 			Typer.hidepop(); // hide all popups
-		}else if(key.ctrlKey==true && key.keyCode=='74'){ // key 74 = j key
-   	window.open("http://www.amazon.com/gp/product/B004PO10E2/ref=as_li_tl?ie=UTF8&camp=1789&creative=9325&creativeASIN=B004PO10E2&linkCode=as2&tag=reitpl-20&linkId=MFSVWPEBS4VB4P4W", "Shure", "height=800,width=1200,menubar=1,status=1,scrollbars=1");
-		}else if(key.ctrlKey==true && key.keyCode=='82'){ // key 82 = r key
-			window.open("http://bit.ly/QtObP9", "rc", "height=800,width=1200,menubar=1,status=1,scrollbars=1");
-		}else if(key.ctrlKey==true && key.keyCode=='71'){ // key 71 = g key
-			window.open("http://www.anrdoezrs.net/click-4483946-10812784", "thinkgeek", "height=800,width=1200,menubar=1,status=1,scrollbars=1");
-		}
-		else if(key.ctrlKey==true && key.keyCode=='72'){ // key 72 = h key
-			window.open("http://www.amazon.com/gp/holidaytoylist/?ref_=assoc_tag_ph_1445273503604&ie=UTF8&camp=1789&creative=9325&linkCode=pf4&tag=reitpl-20&linkId=OVCBLJD2WBIRQ7V4", "Holiday Deals", "height=800,width=1200,menubar=1,status=1,scrollbars=1");
 		}
 		else if(key.ctrlKey==true && key.keyCode=='80'){ // key 80 = p
-	   	window.open("https://coinexchange.io/?r=268475a8", "coinexchange", "height=800,width=1200,menubar=1,status=1,scrollbars=1");
-			}else if(key.ctrlKey==true && key.keyCode=='82'){ // key 82 = r key
-				window.open("http://amzn.to/S0g0Qg", "rby", "height=800,width=1200,menubar=1,status=1,scrollbars=1");
+			location.href = "https://github.com/lukasz26671";
 			}else if(key.ctrlKey==true && key.keyCode=='66'){ // key 66 = b key
-				window.open("https://www.coinbase.com/join/52841b7b083311388d0000a6", "bitcoin", "height=800,width=1200,menubar=1,status=1,scrollbars=1");
-			}
-			else if(key.ctrlKey==true && key.keyCode=='73'){ // key 73 = i key
-				window.open("http://www.amazon.com/gp/product/B015E8U6EM/ref=as_li_tl?ie=UTF8&camp=1789&creative=9325&creativeASIN=B015E8U6EM&linkCode=as2&tag=reitpl-20&linkId=VXCMASRUSEG56RL3", "iPhone", "height=800,width=1200,menubar=1,status=1,scrollbars=1");
+				location.href = "https://lukasz26671.github.io";
 			}
 			else if(key.ctrlKey==true && key.keyCode=='76'){ // key 76 = l key
-				window.open("https://www.binance.com/?ref=12091062", "binance", "height=800,width=1200,menubar=1,status=1,scrollbars=1");
+				location.href = "https://hackertyper.net";
 			}
 			else if(key.ctrlKey==true && key.keyCode=='69'){ // key 69 = e key
-				window.open("http://visualsitesearch.com", "vss", "height=800,width=1200,menubar=1,status=1,scrollbars=1");
+				location.href = "https://lukasz26671.github.io/Kalkulator";
 			}
 		else if(Typer.text){ // otherway if text is loaded
 			var cont=Typer.content(); // get the console content
