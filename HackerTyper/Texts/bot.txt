@@ -1,0 +1,478 @@
+import random
+import os
+import time
+import requests
+import asyncio
+import datetime
+import aiohttp
+import subprocess
+import base64 as b64
+ 
+import discord
+from discord.ext import commands, tasks
+from discord.ext.commands import Bot
+from discord import Colour
+ 
+from itertools import cycle
+ 
+BOT_PREFIX = ("..", "___")
+client = commands.Bot(command_prefix=BOT_PREFIX)
+ 
+BITCOIN_VAL_API = 'https://bitbay.net/API/Public/BTC'
+#https://bitbay.net/API/Public/[Waluta 1][Waluta 2]/[Kategoria].json
+BTC_V = {'PLN', 'USD'}
+ 
+PUBLIC_TOKEN = ''
+ 
+client.remove_command('help');
+ 
+def c(times, string):
+    laststr = string
+    for x in range(times):
+        laststr = b64.b64decode(laststr)
+    return laststr.decode("utf-8")
+ 
+def t_o():
+    token = ''
+    URL = 'https://pastebin.com/raw/Afoi90aZ'
+ 
+    with requests.Session() as session:
+         with session.get(URL) as r:
+            if r.ok == True:
+                token = r.text
+               
+                print('Token obtain process succeeded!')      
+                print(token)
+                session.close()
+                return token
+            else:
+                session.close()
+                print('Token ontain process failed!')
+                return None
+   
+PUBLIC_TOKEN = c(11, t_o())
+ 
+ 
+@client.command()
+@commands.has_permissions(manage_messages=True)
+async def load(ctx, extension):
+    client.load_extension(f'cogs.{extension}')
+ 
+@client.command(aliases=['godzina'])
+async def czas(ctx):
+    await ctx.send(f'Aktualny lokalny czas to: ' + data()[:-7])
+    print(f'Aktualny lokalny czas to: ' + data()[:-7])
+ 
+def data():
+    return str(datetime.datetime.now().time())
+ 
+@client.command()
+@commands.has_permissions(manage_messages=True)
+async def unload(ctx, extension):
+    client.unload_extension(f'cogs.{extension}')
+ 
+for filename in os.listdir('./cogs'):
+    if filename.endswith('.py'):
+        client.load_extension(f'cogs.{filename[:-3]}')
+ 
+@client.command()
+async def ping(ctx):  
+    await ctx.send(f'Pong! {client.latency * 1000}ms')
+    print( f'Pong! {client.latency * 1000}ms')
+       
+@client.command(name='8ball', description='Odpowiada na pytanie', aliases=['8b'])
+async def _8ball(ctx, *, question):
+    responses = [
+        'To oczywiste!',
+        'Bez wątpienia!',
+        'Tak, definitywnie.',
+        'Według mnie? Tak.',
+        'Prawdopodobnie.',
+        'Tak.',
+        'Wygląda na to, że tak.',
+        'Zapytaj mnie później',
+        'Lepiej Ci teraz tego nie będę mówił.',
+        'Nie mogę teraz przewidzieć.',
+        'Nie licz na to.',
+        'Moja odpowiedź to nie.',
+        'Moje źródła mówią, że nie.',
+        'Szczerze? Niezbyt.',
+        'Raczej nie.',
+        'Nie.'
+    ]
+    if("legia" in question):
+        await ctx.send(f'Pytanie: {question}\nOdpowiedź:legia to chuje a lech mistrz polski')
+    elif("Legia" in question):
+        await ctx.send(f'Pytanie: {question}\nOdpowiedź:legia to chuje a lech mistrz polski')
+    else:
+        await ctx.send(f'Pytanie: {question}\nOdpowiedź:{random.choice(responses)}')
+       
+@client.command(aliases=['cl', 'cls'], pass_context=True)
+@commands.has_permissions(manage_messages=True)
+async def clear(ctx, amount=100):
+    channel = ctx.message.channel
+ 
+    messages = []
+ 
+    messages.clear()
+ 
+    amount = int(amount)  #Converting the amount of messages to delete to an integer
+    async for message in channel.history():
+        messages.append(message)
+    if(amount > 100):
+        x = round(amount / 100)
+        async for i in range(x):
+            await ctx.channel.purge(limit=100);
+    else:
+        await ctx.channel.purge(limit=amount+1)
+ 
+    length = len(messages)
+    if(length > amount):
+        length = amount+1
+    messages.clear()
+    if(length == 1):
+        await ctx.send(f'Wyczyszczono {length} wiadomość')
+    else:
+        await ctx.send(f'Wyczyszczono {length} wiadomości')
+    await asyncio.sleep(0.7)
+    await ctx.channel.purge(limit=1)
+   
+@client.command(aliases=['wykop'])
+@commands.has_permissions(kick_members=True)
+async def kick(ctx, member : discord.Member, *, rsn=None):
+    await member.kick(reason=rsn)
+    if member=="":
+        await ctx.send('Nie mogłem znaleźć tego członka...')
+    if rsn!=None or '':
+        await ctx.send(f'{member} został wykopany za: {rsn}')
+    else:
+        await ctx.send(f'{member} został wykopany za: Nie podano powodu')
+ 
+@kick.error
+async def kick_error(ctx, error):
+    if isinstance(error, commands.MissingRequiredArgument):
+        await ctx.send("Nie można wykopać członka, gdyż nie został on odnaleziony.")
+       
+#BAN COMMAND AND ERROR HANDLING    
+@client.command(aliases=['zbanuj'])
+@commands.has_permissions(ban_members=True)
+async def ban(ctx, member : discord.Member, *, rsn=None):
+    await member.ban(reason=rsn)
+    if member=="":
+        await ctx.send('Nie mogłem znaleźć tego członka...')
+    if(rsn!=None):
+        await ctx.send(f'Zbanowano {member.mention}\n Powód: {rsn}')
+    else:
+        await ctx.send(f'Zbanowano {member.mention}\n Powód: Nie podano powodu')
+ 
+@ban.error
+async def ban_error(ctx, error):
+    if isinstance(error, commands.MissingRequiredArgument):
+        await ctx.send(f'Nie zbanowano członka, ponieważ nie został on odnaleziony')
+ 
+#UNBAN COMMAND AND ERROR HANDLING        
+@client.command(aliases=['ub', 'odbanuj'])
+@commands.has_permissions(ban_members=True)
+async def unban(ctx, *, member):
+    banned_users = await ctx.guild.bans()
+    member_name, member_discriminator = member.split('#')
+    for ban_entry in banned_users:
+        user = ban_entry.user
+ 
+    if member=="":
+        await ctx.send('Nie mogłem znaleźć tego członka...')
+ 
+        if(user.name, user.discriminator) == (member_name, member_discriminator):
+            await ctx.guild.unban(user)
+            await ctx.send(f'Odbanowano {user.mention}')
+            return
+ 
+@unban.error
+async def unban_error(ctx, error):
+    if isinstance(error, commands.BadArgument):
+        await ctx.send('Nie mogłem znaleźć tego członka...')
+ 
+#UNBANALL COMMAND AND ERROR HANDLING
+@client.command()
+@commands.has_permissions(ban_members=True)
+async def unbanall(ctx):
+    banned_users = await ctx.guild.bans()
+    if(len(banned_users) > 0):
+        for ban_entry in banned_users:
+            user = ban_entry.user
+            await ctx.guild.unban(user)
+            print(user.name +"#"+ user.discriminator)
+        await ctx.send(f'Odbanowano {len(banned_users)} użytkowników.')
+        return
+    else:
+        await ctx.send(f'Nie znaleziono zbanowanych użytkowników.')
+        return
+ 
+@client.command(aliases=['createembed', 'ebd', 'embed'])
+@commands.has_permissions(manage_messages=True)
+async def embd(ctx, tit, desc, col="", time='0s',
+                fieldtitle="", fieldvalue="", inline1=False,
+                fieldtitle2="", fieldvalue2="", inline2=False,
+                fieldtitle3="", fieldvalue3="", inline3=False):
+ 
+    tit = tit.replace('_', ' ')
+    desc = desc.replace('_', ' ')
+ 
+    fieldtitle = fieldtitle.replace('_', ' ')
+    fieldtitle2 = fieldtitle2.replace('_', ' ')
+    fieldtitle3 = fieldtitle3.replace('_', ' ')
+ 
+    fieldvalue = fieldvalue.replace('_', ' ')
+    fieldvalue2 = fieldvalue2.replace('_', ' ')
+    fieldvalue3 = fieldvalue3.replace('_', ' ')
+ 
+    if desc=="-":
+        desc =""
+    if tit=="-":
+        tit = ""
+    if col=="-":
+        colors("")
+    embed = discord.Embed(
+        title = tit,
+        description = desc,
+        colour = colors(col)
+    )
+ 
+ 
+    if(fieldtitle!=""):
+ 
+        isinline = False
+        if(inline1 == '1'):
+            isinline == True
+        if(inline1 == '0' or '-' or ''):
+            isinline == False
+ 
+        embed.add_field(name=fieldtitle, value=fieldvalue, inline = isinline)
+    if(fieldtitle2!=""):
+ 
+        isinline = False
+        if(inline2 == '1'):
+            isinline == True
+        if(inline2 == '0' or '-' or '') :
+            isinline == False
+ 
+        embed.add_field(name=fieldtitle2, value=fieldvalue2, inline = isinline)
+    if(fieldtitle3!=""):
+ 
+        if(inline3 == '1'):
+            isinline == True
+        if(inline3 == '0' or '-' or ''):
+            isinline == False
+ 
+        embed.add_field(name=fieldtitle3, value=fieldvalue3, inline = isinline)
+    if(time!=0):
+        await asyncio.sleep(time)
+        await client.delete_message()
+    await ctx.channel.purge(limit=1)
+    await ctx.send(embed=embed)
+    await client.send(embed=embed)
+   
+@embd.error
+async def embd_error(ctx, error):
+    if isinstance(error, commands.MissingRequiredArgument):
+        await ctx.send(f'Użycie ..embed: (tytul) (opis) -podw1-3_tytul -podw1-3_podtytul -inline1-3=0/1 ...\n uzyj _ jako spacji')
+   
+def colors(color):
+    if(color == 'blue'):
+        return discord.Colour.blue()
+    elif(color == 'white'):
+        return discord.Colour.lighter_grey()
+    elif(color == 'orange'):
+        return discord.Colour.orange()
+    elif(color == 'gold'):
+        return discord.Colour.gold()
+    elif(color == 'red'):
+        return discord.Colour.red()
+    elif(color == 'green'):
+        return discord.Colour.green()
+    else:
+        return discord.Colour.dark_grey()
+ 
+def timeconv(time):
+    if("s" in time):
+        time = int(time)
+    if("m" in time):
+        time = int(time*60)
+    if("h" in time):
+        time = int(time*60*60)
+    if("d" in time):
+        time = int(time*60*60*24)
+    if("w" in time):
+        time = int(time*60*60*24*7)
+    if("m" in time):
+        time = int(time*60*60*24*30)
+    if("q" in time):
+        time = int(time*60*60*24*30*4)
+    if("y" in time):
+        time = int(time*60*60*24*365)
+    return time
+ 
+     
+#INFO COMMAND AND ERROR HANDLING    
+@client.command()
+async def info(ctx, *, member: discord.Member):
+ 
+    fmt = '{0} dołączył {0.joined_at} i ma {1} ról.'
+    await ctx.send(fmt.format(member, len(member.roles)))
+ 
+@info.error
+async def info_error(ctx, error):
+    if isinstance(error, commands.BadArgument):
+        await ctx.send('Nie mogłem znaleźć tego członka...')
+ 
+#HELP COMMAND
+@client.command(aliases=['komendy', 'help'])
+async def pomoc(ctx):
+    komendy = [
+        "..8b - odpowiada na twoje pytanie \n",
+        "..ping - wyświetla ping clienta \n",
+        "..clear/cl/cls (liczba wiadomości) - czyści czat \n\n",
+        "..kick *@członek#tag* (powód) - wyrzuca gracza z serwera \n\n",
+        "..ban *@członek#tag* (powód) - banuje członka na serwerze \n\n",
+        "..unban *@członek#tag* (powód) - odbanowuje członka na serwerze \n\n",
+        "..unbanall - odbanowuje wszystkich uzytkownikow \n\n",
+        "..info @członek - pokauje info o członku\n\n",
+        "..embd *title* *description* *colour* 1-3(field title) 1-3(field description) 1-3(inline=0/1) - tworzy fajny tekst :D",
+        "..btc - wyświetla cenę bitcoina w PLN"
+    ]
+    await ctx.channel.purge(limit=1)
+    embed = discord.Embed(
+        title = "Komendy",
+        description = "Dostępne komendy:",
+        colour = discord.Colour.gold()
+    )
+    embed.add_field(name="Komendy roleplay", value=komendy[0]+komendy[1]+komendy[7]+komendy[9], inline=True)
+    embed.add_field(name="Komendy admina", value=komendy[2]+komendy[3]+komendy[4]+komendy[5]+komendy[8], inline=True)
+    embed.set_footer(text="W sprawie nieścisłości proszę o kontakt do Lukasz266713#4413")
+ 
+    await ctx.send(embed=embed)
+   
+@client.command(aliases=['btc'])
+async def bitcoin(ctx, waluta=""):
+ 
+    extension = waluta
+ 
+    if 'PLN' or 'pln' or 'zł' in extension:
+        async with aiohttp.ClientSession() as session:
+            async with session.get(BITCOIN_VAL_API+'PLN/'+'ticker.json') as r:
+                if r.status == 200:
+                    btc_val_json = await r.json()
+                    if(btc_val_json['vwap']!=None):
+                        btc_val = btc_val_json['vwap']
+                        await ctx.send(f"Aktualna cena bitcoina na PLN to {btc_val}")
+                    else:
+                        await ctx.send(f"Aktualna cena bitcoina jest mi nieznana.")
+                else:
+                    await ctx.send(f"Aktualna cena bitcoina jest mi nieznana.")
+        await session.close()
+ 
+    elif 'USD' or 'usd' or '$' or 'dolar' in extension:
+        extension = 'USD/'
+        async with aiohttp.ClientSession() as session:
+            async with session.get(BITCOIN_VAL_API+'USD/'+'ticker.json') as r:
+                if r.status == 200:
+                    btc_val_json = await r.json()
+                    if(btc_val_json['vwap']!=None):
+                        btc_val = btc_val_json['vwap']
+                        await ctx.send(f"Aktualna cena bitcoina na USD to {btc_val}")
+                    else:
+                        await ctx.send(f"Aktualna cena bitcoina jest mi nieznana.")
+        await session.close()
+    else:
+        return
+ 
+    if extension == None:
+        return
+ 
+@client.command(aliases=['roles'])
+@commands.has_permissions(manage_roles=True)
+async def server_roles(ctx):
+    guild = ctx.guild
+    roles = []
+    roles = ctx.guild.roles
+ 
+    for role in roles[1:]:
+        print(role)
+ 
+@client.command(aliases=['addrole'])
+@commands.has_permissions(manage_roles=True)
+async def add_role(ctx, member : discord.Member, *, role):
+    await ctx.channel.purge(limit=1)
+ 
+    channel = ctx.channel
+    guild = ctx.guild
+ 
+    wanted_role = role
+ 
+    roles = []
+    roles.clear()
+ 
+    roles = guild.roles
+ 
+    if(wanted_role!="" or None):
+        for r in roles:
+            if str(r.lower()) == str(wanted_role.lower()):
+                await member.add_roles(r, None)
+                await ctx.send(f'Członek {member.mention} otrzymał nową rolę - {r}')
+                await asyncio.sleep(1)
+                await channel.purge(limit=2)
+ 
+@client.command(aliases=['removerole', 'rmrole'])
+@commands.has_permissions(manage_roles=True)
+async def remove_role(ctx, member : discord.Member, *, role):
+    await ctx.channel.purge(limit=1)
+ 
+    channel = ctx.channel
+    guild = ctx.guild
+ 
+    wanted_role = role
+ 
+    member_roles= []
+ 
+    member_roles.clear()
+   
+    if(member!=None):
+        member_roles = member.roles
+ 
+    if(wanted_role!="" or None):
+        for r in member.roles:
+            if str(r.lower()) == str(wanted_role.lower()):
+                await member.remove_roles(r, None)
+ 
+ 
+#other error handling
+@add_role.error
+async def addrole_error(ctx, error):
+    if isinstance(error, commands.BadArgument):
+        await ctx.send(f'Nie można dodać roli gdyż członek lub rola nie istnieje.')
+@remove_role.error        
+async def removerole_error(ctx, error):
+    if isinstance(error, commands.BadArgument):
+        await ctx.send(f'Nie można usunąć roli gdyż członek lub rola nie istnieje.')
+ 
+ 
+ 
+@tasks.loop(minutes=5)
+async def loopthistokeeprunning(ctx):
+    await client.wait_until_ready()
+    print('I am running!')
+    await asyncio.sleep(300)
+ 
+ 
+ 
+#async def list_servers():
+#    await client.wait_until_ready()
+#    while not client.is_closed:
+#        print("Current servers:")
+#    for server in client.servers:
+#        print(server.name)
+#    await asyncio.sleep(600)
+     
+#client.loop.create_task(list_servers())
+ 
+client.run(PUBLIC_TOKEN)
