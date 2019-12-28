@@ -82,9 +82,9 @@ h1, h2, p {
      };
 			Typer.speed=3;
       
-      var typerFiles = ['kernel.txt', 'reverse_shell.txt', "quantum_encrypter.txt"];
+      var typerFiles = ['./HackerTyper/Texts/kernel.txt', './HackerTyper/Texts/reverse_shell.txt', "./HackerTyper/Texts/quantum_encrypter.txt", 'https://raw.githubusercontent.com/lukasz26671/Lukasz26671Utils/1.7.10/src/main/java/io/github/lukasz26671/ObsidianTools.java', 'https://pastebin.pl/view/raw/2a670c21'];
 
-			Typer.file='./HackerTyper/Texts/' + typerFiles[rand(0, typerFiles.length-1)];
+			Typer.file=typerFiles[rand(0, typerFiles.length-1)];
 
 			Typer.init();
 
