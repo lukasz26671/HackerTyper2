@@ -69,17 +69,22 @@ h1, h2, p {
 		<script src="./HackerTyper/script.js" type="text/javascript"></script>
 
     <script type="text/javascript">
+      
+      var rand = function(min, max) {
+      if (min==null && max==null)
+      return 0;    
     
-    function randInt(min, max) {
-      min = Math.ceil(min);
-      max = Math.floor(max);
-      return Math.floor(Math.random() * (max - min)) + min; //The maximum is exclusive and the minimum is inclusive
-    }
+      if (max == null) {
+         max = min;
+         min = 0;
+        }
+        return min + Math.floor(Math.random() * (max - min + 1));
+     };
 			Typer.speed=3;
       
       var typerFiles = ['kernel.txt', 'reverse_shell.txt', "quantum_encrypter.txt"];
 
-			Typer.file='./HackerTyper/Texts/' + typerFiles[randInt(0, typerFiles.length)];
+			Typer.file='./HackerTyper/Texts/' + typerFiles[rand(0, typerFiles.length-1)];
 
 			Typer.init();
 
