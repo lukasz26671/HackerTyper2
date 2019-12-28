@@ -82,9 +82,16 @@ h1, h2, p {
      };
 			Typer.speed=3;
       
-      var typerFiles = ['./HackerTyper/Texts/kernel.txt', './HackerTyper/Texts/reverse_shell.txt', "./HackerTyper/Texts/quantum_encrypter.txt", 'https://raw.githubusercontent.com/lukasz26671/Lukasz26671Utils/1.7.10/src/main/java/io/github/lukasz26671/ObsidianTools.java', 'https://pastebin.pl/view/raw/2a670c21'];
+      var typerFiles = ['./HackerTyper/Texts/kernel.txt', './HackerTyper/Texts/reverse_shell.txt', "./HackerTyper/Texts/quantum_encrypter.txt", 'https://raw.githubusercontent.com/lukasz26671/Lukasz26671Utils/1.7.10/src/main/java/io/github/lukasz26671/ObsidianTools.java', 'https://pastebin.com/raw/jLAYS9P8'];
 
-			Typer.file=typerFiles[rand(0, typerFiles.length-1)];
+			try {
+			  Typer.file=typerFiles[rand(0, typerFiles.length-1)];
+			}
+			catch(error) {
+			 // expected output: ReferenceError: nonExistentFunction is not defined
+			// Note - error messages will vary depending on browser
+				Typer.file=typerFiles[rand(0, typerFiles.length-2)];
+			}
 
 			Typer.init();
 
@@ -105,23 +112,4 @@ h1, h2, p {
         </tbody></table>
         </div>
 <script src="./HackerTyper/js" type="text/javascript" style="display: none !important;"></script>
-<script type="text/javascript">try{ clicky.init(66417119); }catch(e){}</script>
-
-<script type="text/javascript">
-
-  var _gaq = _gaq || [];
-  _gaq.push(['_setAccount', 'UA-38069369-1']);
-  _gaq.push(['_trackPageview']);
-
-  (function() {
-    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
-    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
-    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
-  })();
-
-</script>
-
-	
-
-
 </body></html>
